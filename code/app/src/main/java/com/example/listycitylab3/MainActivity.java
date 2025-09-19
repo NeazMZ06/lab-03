@@ -1,15 +1,16 @@
 package com.example.listycitylab3;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.listycitylab3.City;
+import com.example.listycitylab3.CityArrayAdapter;
+import com.example.listycitylab3.R;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class MainActivity extends AppCompatActivity implements AddCityFragment.AddCityDialogListener {
 
@@ -17,8 +18,8 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
     private ListView cityList;
     private CityArrayAdapter cityAdapter;
 
-    // Keeps track of the city currently being edited
-    private City clickedCity;
+    // 🔄 renamed from clickedCity → selectedCity for consistency
+    private City selectedCity;
 
     @Override
     public void addCity(City city) {
@@ -26,7 +27,6 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
         cityAdapter.notifyDataSetChanged();
     }
 
-    // ✅ New helper to refresh the ListView after editing
     public void updateCityList() {
         cityAdapter.notifyDataSetChanged();
     }
@@ -36,13 +36,11 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        String[] cities = {
-                "Edmonton", "Vancouver", "Toronto"
-        };
-        String[] provinces = {"AB", "BC", "ON"};
+        String[] cities = { "Edmonton", "Vancouver", "Toronto" };
+        String[] provinces = { "AB", "BC", "ON" };
 
         dataList = new ArrayList<>();
-        for (int i = 0; i < cities.length; ++i) {
+        for (int i = 0; i < cities.length; i++) {
             dataList.add(new City(cities[i], provinces[i]));
         }
 
@@ -51,15 +49,14 @@ public class MainActivity extends AppCompatActivity implements AddCityFragment.A
         cityList.setAdapter(cityAdapter);
 
         FloatingActionButton fab = findViewById(R.id.button_add_city);
-        fab.setOnClickListener(v -> {
-            new AddCityFragment().show(getSupportFragmentManager(), "Add City");
-        });
+        fab.setOnClickListener(v ->
+                new AddCityFragment().show(getSupportFragmentManager(), "Add City")
+        );
 
-        // ➕ Edit option: tap a city to open the dialog for editing
+        // Edit option
         cityList.setOnItemClickListener((adapterView, view, position, id) -> {
-            clickedCity = dataList.get(position);
-            // Pass the selected city to the fragment for editing
-            new AddCityFragment(clickedCity).show(getSupportFragmentManager(), "Edit City");
+            selectedCity = dataList.get(position);
+            new AddCityFragment(selectedCity).show(getSupportFragmentManager(), "Edit City");
         });
     }
 }

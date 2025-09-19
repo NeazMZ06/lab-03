@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.listycitylab3.City;
-import com.example.listycitylab3.R;
+import com.example.listycitylab3.MainActivity;
 
 public class AddCityFragment extends DialogFragment {
 
@@ -24,15 +24,15 @@ public class AddCityFragment extends DialogFragment {
 
     private AddCityDialogListener listener;
 
-    // ➕ Holds the city to edit (null when adding)
-    private City chosenCity;
+    // 🔄 renamed from chosenCity → selectedCity
+    private City selectedCity;
 
-    // ➕ Constructor for edit mode
+    // Constructor for edit mode
     public AddCityFragment(City city) {
-        this.chosenCity = city;
+        this.selectedCity = city;
     }
 
-    // ➕ Empty constructor for add mode
+    // Empty constructor for add mode
     public AddCityFragment() {
     }
 
@@ -46,12 +46,11 @@ public class AddCityFragment extends DialogFragment {
         }
     }
 
-    // ➕ Refresh the list when editing finishes
     @Override
     public void onDismiss(@NonNull DialogInterface dialog) {
         super.onDismiss(dialog);
-        if (chosenCity != null && getActivity() instanceof MainActivity) {
-            ((MainActivity) getActivity()).updateCityList(); // call the helper in MainActivity
+        if (selectedCity != null && getActivity() instanceof MainActivity) {
+            ((MainActivity) getActivity()).updateCityList();
         }
     }
 
@@ -63,26 +62,24 @@ public class AddCityFragment extends DialogFragment {
         EditText editCityName = view.findViewById(R.id.edit_text_city_text);
         EditText editProvinceName = view.findViewById(R.id.edit_text_province_text);
 
-        // ➕ Pre-fill fields if editing
-        if (chosenCity != null) {
-            editCityName.setText(chosenCity.getName());
-            editProvinceName.setText(chosenCity.getProvince());
+        // Pre-fill fields if editing
+        if (selectedCity != null) {
+            editCityName.setText(selectedCity.getName());
+            editProvinceName.setText(selectedCity.getProvince());
         }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder
                 .setView(view)
-                // ➕ Dynamic title
-                .setTitle(chosenCity != null ? "Edit City" : "Add a city")
+                .setTitle(selectedCity != null ? "Edit City" : "Add a city")
                 .setNegativeButton("Cancel", null)
-                // ➕ Dynamic button text and action
-                .setPositiveButton(chosenCity != null ? "Edit" : "Add", (dialog, which) -> {
+                .setPositiveButton(selectedCity != null ? "Edit" : "Add", (dialog, which) -> {
                     String cityName = editCityName.getText().toString();
                     String provinceName = editProvinceName.getText().toString();
-                    if (chosenCity != null) {
+                    if (selectedCity != null) {
                         // Edit mode: update existing city
-                        chosenCity.setName(cityName);
-                        chosenCity.setProvince(provinceName);
+                        selectedCity.setName(cityName);
+                        selectedCity.setProvince(provinceName);
                     } else {
                         // Add mode: create a new city
                         listener.addCity(new City(cityName, provinceName));
